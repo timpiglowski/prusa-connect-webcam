@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+    camera:
+        build: .
+        container_name: pi_camera
+        restart: unless-stopped
+        devices:
+            - /dev/video0:/dev/video0
+        volumes:
+            - ./output:/app/output
+        env_file:
+            - ./app/config/config.env
+        group_add:
+            - video
+        # Remove privileged mode as it's not needed with proper permissions
