@@ -6,12 +6,14 @@ A Python-based service that captures images from a USB camera and uploads them t
 ## Notes
 A few words about the project. This is a very experimental project. I did no testing with other camers than my Logitech C270, or on other hardware. It *should* work fine, but that's about as confident as it gets. I'd love to hear from anyone who has it running or which errors ocurr. Furthermore, this is my first ever docker repository, so I'm sure there's a lot of room for improvement. I'm always happy to get feedback!
 
+Furthermore, I want to say thank you to @cannikin, who wrote a bash script to use the Camera Module for Prusa Connect. This project is greatly inspired by [cannikin's script](https://gist.github.com/cannikin/4954d050b72ff61ef0719c42922464e5) and would not exist without it.
+
 ## Installation
 1. Make sure your Camera is connected and recognized by the Raspberry Pi. You can use
-```bash
-ls /dev/video*
-```
-to list all video devices. You should see somethin like `/dev/video0`.
+  ```bash
+  ls /dev/video*
+  ```
+  to list all video devices. You should see somethin like `/dev/video0`.
 
 2. Get your camera token. Login to Prusa Connect, go to the camera tab and hit "Add New other camera". Give it a descriptive name and copy the token.
 
