@@ -4,6 +4,7 @@ import cv2
 import requests
 import urllib3
 import logging
+from datetime import datetime
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -19,9 +20,16 @@ LONG_DELAY_SECONDS = int(os.getenv('LONG_DELAY_SECONDS', 60))
 FINGERPRINT = os.getenv('FINGERPRINT', '123456789012345678')
 CAMERA_TOKEN = os.getenv('CAMERA_TOKEN', 'mvq1Q9dXC3lvDDTDgQ9U')
 CAMERA_RESOLUTION = (2274, 1280)
-def capture_image(output_path):
+IMAGES_DIR = '/app/camera_images'
+
+def ensure_directory():
+    os.makedirs(IMAGES_DIR, exist_ok=True)
+
+def capture_image():
     max_retries = 3
     retry_delay = 2
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    output_path = os.path.join(IMAGES_DIR, f'capture_{timestamp}.jpg')
 
     for attempt in range(max_retries):
         try:
@@ -38,7 +46,7 @@ def capture_image(output_path):
 
             cv2.imwrite(output_path, frame, [cv2.IMWRITE_JPEG_QUALITY, 80])
             cap.release()
-            return
+            return output_path
 
         except Exception as e:
             logger.error(f"Camera error on attempt {attempt + 1}: {str(e)}")
@@ -48,10 +56,11 @@ def capture_image(output_path):
                 raise
 
 def main():
+    ensure_directory()
+
     while True:
         try:
-            output_path = '/tmp/output.jpg'
-            capture_image(output_path)
+            image_path = capture_image()
 
             headers = {
                 'accept': '*/*',
@@ -60,7 +69,7 @@ def main():
                 'token': CAMERA_TOKEN
             }
 
-            with open(output_path, 'rb') as image_file:
+            with open(image_path, 'rb') as image_file:
                 response = requests.put(
                     HTTP_URL,
                     headers=headers,
@@ -68,6 +77,7 @@ def main():
                     verify=False
                 )
 
+            os.remove(image_path)
             logger.info(f'Image uploaded successfully. Next capture in {DELAY_SECONDS}s')
             delay = DELAY_SECONDS
 

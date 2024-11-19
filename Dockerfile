@@ -9,14 +9,15 @@ RUN apt-get update && apt-get install -y \
 # Create app directory
 WORKDIR /app
 
-# Install Python dependencies
-COPY app/requirements.txt .
+# Copy requirements first to leverage Docker cache
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
-COPY app/ .
+# Copy the script
+COPY camera_service.py .
 
-# Create output directory
-RUN mkdir -p /app/output
+# Create directory for images
+RUN mkdir -p /app/camera_images
 
-CMD ["python", "main.py"]
+# Run the script
+CMD ["python", "camera_service.py"]
