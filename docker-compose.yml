@@ -1,0 +1,15 @@
+services:
+    camera:
+        build: .
+        volumes:
+            - ./camera_images:/app/camera_images
+            - /dev/video0:/dev/video0
+        environment:
+            - HTTP_URL=https://connect.prusa3d.com/c/snapshot
+            - DELAY_SECONDS=10
+            - LONG_DELAY_SECONDS=60
+            - FINGERPRINT=123456789012345678
+            - CAMERA_TOKEN=mvq1Q9dXC3lvDDTDgQ9U
+        restart: unless-stopped
+        devices:
+            - "/dev/video0:/dev/video0"

@@ -1,4 +1,3 @@
 opencv-python-headless
 requests
 urllib3
-python-dotenv
