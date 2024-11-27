@@ -14,22 +14,36 @@ logger = logging.getLogger(__name__)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Environment variables with defaults
-HTTP_URL = os.getenv('HTTP_URL', 'https://connect.prusa3d.com/c/snapshot')
-DELAY_SECONDS = int(os.getenv('DELAY_SECONDS', 10))
-LONG_DELAY_SECONDS = int(os.getenv('LONG_DELAY_SECONDS', 60))
-FINGERPRINT = os.getenv('FINGERPRINT', '123456789012345678')
-CAMERA_TOKEN = os.getenv('CAMERA_TOKEN', 'mvq1Q9dXC3lvDDTDgQ9U')
+HTTP_URL = os.getenv("HTTP_URL", "https://connect.prusa3d.com/c/snapshot")
+DELAY_SECONDS = int(os.getenv("DELAY_SECONDS", 10))
+LONG_DELAY_SECONDS = int(os.getenv("LONG_DELAY_SECONDS", 60))
+FINGERPRINT = os.getenv("FINGERPRINT", "123456789012345678")
+CAMERA_TOKEN = os.getenv("CAMERA_TOKEN", "mvq1Q9dXC3lvDDTDgQ9U")
 CAMERA_RESOLUTION = (2274, 1280)
-IMAGES_DIR = '/app/camera_images'
+IMAGES_DIR = "/app/camera_images"
+ROTATION_ANGLE = int(os.getenv("ROTATION_ANGLE", 0))  # Possible values: 0, 90, 180, 270
 
 def ensure_directory():
     os.makedirs(IMAGES_DIR, exist_ok=True)
 
+def rotate_image(frame, angle):
+    match angle:
+        case 0:
+            return frame
+        case 90:
+            return cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
+        case 180:
+            return cv2.rotate(frame, cv2.ROTATE_180)
+        case 270:
+            return cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
+        case _:
+            raise ValueError('Rotation angle must be 0, 90, 180, or 270 degrees')
+
 def capture_image():
     max_retries = 3
     retry_delay = 2
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    output_path = os.path.join(IMAGES_DIR, f'capture_{timestamp}.jpg')
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_path = os.path.join(IMAGES_DIR, f"capture_{timestamp}.jpg")
 
     for attempt in range(max_retries):
         try:
@@ -44,7 +58,10 @@ def capture_image():
             if not ret or frame is None:
                 raise RuntimeError("Failed to capture image")
 
-            cv2.imwrite(output_path, frame, [cv2.IMWRITE_JPEG_QUALITY, 80])
+            # Apply rotation
+            rotated_frame = rotate_image(frame, ROTATION_ANGLE)
+
+            cv2.imwrite(output_path, rotated_frame, [cv2.IMWRITE_JPEG_QUALITY, 80])
             cap.release()
             return output_path
 
@@ -63,13 +80,13 @@ def main():
             image_path = capture_image()
 
             headers = {
-                'accept': '*/*',
-                'content-type': 'image/jpg',
-                'fingerprint': FINGERPRINT,
-                'token': CAMERA_TOKEN
+                "accept": "*/*",
+                "content-type": "image/jpg",
+                "fingerprint": FINGERPRINT,
+                "token": CAMERA_TOKEN
             }
 
-            with open(image_path, 'rb') as image_file:
+            with open(image_path, "rb") as image_file:
                 response = requests.put(
                     HTTP_URL,
                     headers=headers,
@@ -78,7 +95,7 @@ def main():
                 )
 
             os.remove(image_path)
-            logger.info(f'Image uploaded successfully. Next capture in {DELAY_SECONDS}s')
+            logger.info(f"Image uploaded successfully. Next capture in {DELAY_SECONDS}s")
             delay = DELAY_SECONDS
 
         except Exception as e:
@@ -87,5 +104,5 @@ def main():
 
         time.sleep(delay)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
