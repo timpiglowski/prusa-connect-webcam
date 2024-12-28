@@ -21,7 +21,7 @@ Furthermore, I want to say thank you to @cannikin, who wrote a bash script to us
 ```yaml
 services:
     camera:
-        image: timpiglowski/prusa-connect-webcam:0.1
+        image: timpiglowski/prusa-connect-webcam:0.1.1
         volumes:
             - /opt/prusa-connect-webcam/camera_images:/app/camera_images
             - /dev/video0:/dev/video0
