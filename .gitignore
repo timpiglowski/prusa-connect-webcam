@@ -1,2 +1,31 @@
+# Project Specific
 .env
 /camera_images
+
+
+# Build outputs
+/build/
+/dist/
+/target/
+
+# Dependencies
+/node_modules/
+/vendor/
+
+# Environment and config
+.env
+*.config.local
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.suo
+*.user
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
