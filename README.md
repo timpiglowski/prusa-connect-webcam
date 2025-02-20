@@ -1,5 +1,5 @@
 # prusa-connect-webcam
-[![status: experimental](https://github.com/GIScience/badges/raw/master/status/experimental.svg)](https://github.com/GIScience/badges#experimental)
+[![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa] [![status: experimental](https://github.com/GIScience/badges/raw/master/status/experimental.svg)](https://github.com/GIScience/badges#experimental)
 
 A Python-based service that captures images from a USB camera and uploads them to Prusa Connect. Designed to run on a Raspberry Pi using Docker.
 
